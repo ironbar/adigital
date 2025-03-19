@@ -88,10 +88,10 @@ h1 {
 
 canvas {
     position: fixed;
-    bottom: 0;
+    top: 0;
     left: 0;
     width: 100%;
-    height: 30vh;
+    height: 100vh;
     z-index: 0;
 }
 
@@ -107,10 +107,6 @@ canvas {
     .container {
         padding: 1rem;
     }
-
-    canvas {
-        height: 20vh;
-    }
 }
 
 @media (max-width: 480px) {
@@ -121,4 +117,108 @@ canvas {
     .hero h2 {
         font-size: 1.5rem;
     }
+}
+
+.control-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--secondary-color);
+    color: var(--text-color);
+    z-index: 100;
+    width: 300px;
+    transition: transform 0.3s ease;
+    pointer-events: auto;
+}
+
+.control-panel.hidden {
+    transform: translateX(320px);
+}
+
+.control-group {
+    margin-bottom: 20px;
+}
+
+.control-group h3 {
+    color: var(--secondary-color);
+    margin-bottom: 10px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+}
+
+.control {
+    margin-bottom: 15px;
+}
+
+.control label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.control input[type="range"] {
+    width: 100%;
+    margin-bottom: 5px;
+    background: var(--bg-color);
+    height: 5px;
+    border-radius: 5px;
+    -webkit-appearance: none;
+}
+
+.control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.control .value {
+    font-size: 0.8rem;
+    color: var(--secondary-color);
+}
+
+.sticker-toggles {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.sticker-toggles label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+}
+
+.sticker-toggles input[type="checkbox"] {
+    accent-color: var(--primary-color);
+}
+
+.restart-button, .toggle-button {
+    background: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.restart-button:hover, .toggle-button:hover {
+    background: var(--secondary-color);
+}
+
+.toggle-button {
+    background: transparent;
+    border: 1px solid var(--primary-color);
+    margin-top: 10px;
+    width: 100%;
 } 

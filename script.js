@@ -2,6 +2,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('synthwave');
     const ctx = canvas.getContext('2d');
 
+    // Game UI elements
+    const gameStats = document.querySelector('.game-stats');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const stickerCountDisplay = document.getElementById('stickerCount');
+    const playButton = document.getElementById('playButton');
+
+    // Game state
+    let gameActive = false;
+    let gameStartTime = 0;
+    let gameTimer = null;
+
     // Control panel elements
     const controls = {
         gravity: document.getElementById('gravity'),
@@ -22,6 +33,73 @@ document.addEventListener('DOMContentLoaded', () => {
         stickerSize: 80,
         stickerCount: 6
     };
+
+    // Game functions
+    function startGame() {
+        gameActive = true;
+        gameStartTime = Date.now();
+        gameStats.classList.add('visible');
+        playButton.classList.add('hidden');
+        createStickers();
+        updateStickerCount();
+        
+        // Start the timer
+        gameTimer = setInterval(updateTimer, 100);
+    }
+
+    function endGame() {
+        gameActive = false;
+        clearInterval(gameTimer);
+        playButton.textContent = 'Play Again';
+        playButton.classList.remove('hidden');
+    }
+
+    function updateTimer() {
+        if (!gameActive) return;
+        
+        const elapsed = Date.now() - gameStartTime;
+        const seconds = Math.floor(elapsed / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        
+        timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+
+    function updateStickerCount() {
+        stickerCountDisplay.textContent = stickers.length.toString();
+        if (stickers.length === 0 && gameActive) {
+            endGame();
+        }
+    }
+
+    // Click handling
+    canvas.addEventListener('click', (e) => {
+        if (!gameActive) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        // Check each sticker for click
+        for (let i = stickers.length - 1; i >= 0; i--) {
+            const sticker = stickers[i];
+            const centerX = sticker.x + sticker.size/2;
+            const centerY = sticker.y + sticker.size/2;
+            const distance = Math.sqrt(
+                Math.pow(clickX - centerX, 2) + 
+                Math.pow(clickY - centerY, 2)
+            );
+
+            if (distance < sticker.size/2) {
+                stickers.splice(i, 1);
+                updateStickerCount();
+                break;
+            }
+        }
+    });
+
+    // Play button handler
+    playButton.addEventListener('click', startGame);
 
     // Update parameter displays
     function updateValueDisplay(input) {
@@ -196,11 +274,11 @@ document.addEventListener('DOMContentLoaded', () => {
             .map(path => new Sticker(path, params.stickerSize));
     }
 
-    createStickers();
-
     // Restart simulation
     controls.restart.addEventListener('click', () => {
+        if (gameActive) return; // Don't allow restart during active game
         createStickers();
+        updateStickerCount();
     });
 
     // Wave properties

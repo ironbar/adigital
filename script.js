@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gravity: 0.2,
         bounce: 0.5,
         initialVelocity: 5,
-        stickerSize: 80,
+        stickerSize: 150,
         stickerCount: 6
     };
 

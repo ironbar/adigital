@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Game UI elements
     const gameStats = document.querySelector('.game-stats');
     const timeDisplay = document.getElementById('timeDisplay');
-    const stickerCountDisplay = document.getElementById('stickerCount');
+    const stickersRemainingDisplay = document.getElementById('stickersRemaining');
     const playButton = document.getElementById('playButton');
 
     // Game state
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateStickerCount() {
-        stickerCountDisplay.textContent = stickers.length.toString();
+        stickersRemainingDisplay.textContent = stickers.length.toString();
         if (stickers.length === 0 && gameActive) {
             endGame();
         }

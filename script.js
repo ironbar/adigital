@@ -8,9 +8,10 @@ document.addEventListener('DOMContentLoaded', () => {
         bounce: document.getElementById('bounce'),
         initialVelocity: document.getElementById('initialVelocity'),
         stickerSize: document.getElementById('stickerSize'),
+        stickerCount: document.getElementById('stickerCount'),
         restart: document.getElementById('restart'),
         togglePanel: document.getElementById('togglePanel'),
-        stickerToggles: document.querySelectorAll('.sticker-toggles input[type="checkbox"]')
+        showPanel: document.getElementById('showPanel')
     };
 
     // Simulation parameters
@@ -18,7 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
         gravity: 0.2,
         bounce: 0.8,
         initialVelocity: 5,
-        stickerSize: 80
+        stickerSize: 80,
+        stickerCount: 6
     };
 
     // Update parameter displays
@@ -37,12 +39,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Toggle control panel
-    controls.togglePanel.addEventListener('click', () => {
+    // Toggle control panel visibility
+    function toggleControlPanel(show) {
         const panel = document.querySelector('.control-panel');
-        panel.classList.toggle('hidden');
-        controls.togglePanel.textContent = panel.classList.contains('hidden') ? 'Show Controls' : 'Hide Controls';
-    });
+        const showButton = controls.showPanel;
+        
+        if (show === undefined) {
+            show = panel.classList.contains('hidden');
+        }
+        
+        if (show) {
+            panel.classList.remove('hidden');
+            showButton.classList.remove('visible');
+        } else {
+            panel.classList.add('hidden');
+            showButton.classList.add('visible');
+        }
+    }
+
+    controls.togglePanel.addEventListener('click', () => toggleControlPanel(false));
+    controls.showPanel.addEventListener('click', () => toggleControlPanel(true));
 
     // Set canvas size
     function resizeCanvas() {
@@ -150,28 +166,41 @@ document.addEventListener('DOMContentLoaded', () => {
         'images/stickers/skater-1.png',
         'images/stickers/moto.png',
         'images/stickers/paracaidas.png',
-        'images/stickers/thumbsup.png'
+        'images/stickers/thumbsup.png',
+        'images/stickers/baby.png',
+        'images/stickers/call-center.png',
+        'images/stickers/skater-2.png',
+        'images/stickers/bitcoin_worker.png',
+        'images/stickers/torre_pisa.png',
+        'images/stickers/running.png',
+        'images/stickers/typing.png',
+        'images/stickers/stonks.png',
+        'images/stickers/selfie.png',
+        'images/stickers/idontknow.png',
+        'images/stickers/eating_tortilla2.png',
+        'images/stickers/eating_tortilla.png',
+        'images/stickers/sexy.png',
+        'images/stickers/crying.png',
+        'images/stickers/angry.png',
+        'images/stickers/thumbsup_2.png',
+        'images/stickers/muerto.png',
+        'images/stickers/tragon.png'
     ];
 
-    let stickers = stickerImages.map(path => new Sticker(path, params.stickerSize));
+    let stickers = [];
+
+    function createStickers() {
+        const count = Math.min(parseInt(params.stickerCount), stickerImages.length);
+        stickers = stickerImages
+            .slice(0, count)
+            .map(path => new Sticker(path, params.stickerSize));
+    }
+
+    createStickers();
 
     // Restart simulation
     controls.restart.addEventListener('click', () => {
-        // Get selected stickers
-        const selectedStickers = Array.from(controls.stickerToggles)
-            .filter(toggle => toggle.checked)
-            .map(toggle => toggle.dataset.sticker);
-
-        // Update sticker size
-        params.stickerSize = parseFloat(controls.stickerSize.value);
-
-        // Recreate stickers array with only selected stickers
-        stickers = stickerImages
-            .filter((path, index) => selectedStickers.includes(controls.stickerToggles[index].dataset.sticker))
-            .map(path => new Sticker(path, params.stickerSize));
-
-        // Reset all stickers
-        stickers.forEach(sticker => sticker.reset());
+        createStickers();
     });
 
     // Wave properties

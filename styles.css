@@ -119,6 +119,32 @@ canvas {
     }
 }
 
+.show-controls-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    z-index: 99;
+    transition: background-color 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.show-controls-button.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.show-controls-button:hover {
+    background: var(--secondary-color);
+}
+
 .control-panel {
     position: fixed;
     top: 20px;
@@ -131,12 +157,15 @@ canvas {
     color: var(--text-color);
     z-index: 100;
     width: 300px;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
     pointer-events: auto;
+    opacity: 1;
 }
 
 .control-panel.hidden {
     transform: translateX(320px);
+    opacity: 0;
+    pointer-events: none;
 }
 
 .control-group {

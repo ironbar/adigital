@@ -39,20 +39,19 @@
             </div>
 
             <div class="control-group">
-                <h3>Sticker Selection</h3>
-                <div class="sticker-toggles">
-                    <label><input type="checkbox" data-sticker="party" checked> Party</label>
-                    <label><input type="checkbox" data-sticker="flamenca" checked> Flamenca</label>
-                    <label><input type="checkbox" data-sticker="skater-1" checked> Skater</label>
-                    <label><input type="checkbox" data-sticker="moto" checked> Moto</label>
-                    <label><input type="checkbox" data-sticker="paracaidas" checked> Paracaidas</label>
-                    <label><input type="checkbox" data-sticker="thumbsup" checked> Thumbs Up</label>
+                <h3>Sticker Count</h3>
+                <div class="control">
+                    <label for="stickerCount">Number of Stickers:</label>
+                    <input type="range" id="stickerCount" min="1" max="24" step="1" value="6">
+                    <span class="value">6</span>
                 </div>
             </div>
 
             <button id="restart" class="restart-button">Restart Simulation</button>
             <button id="togglePanel" class="toggle-button">Hide Controls</button>
         </div>
+
+        <button id="showPanel" class="show-controls-button">Show Controls</button>
         <canvas id="synthwave"></canvas>
     </div>
     <script src="script.js"></script>

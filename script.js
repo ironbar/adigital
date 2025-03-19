@@ -177,26 +177,45 @@ document.addEventListener('DOMContentLoaded', () => {
             this.vy = (Math.random() - 0.5) * params.initialVelocity * 2;
             this.rotation = Math.random() * Math.PI * 2;
             this.rotationSpeed = (Math.random() - 0.5) * 0.1;
+            this.lastCollisionTime = 0;
         }
 
         update() {
+            // Apply minimum velocity threshold
+            const minVelocity = 0.1;
+            if (Math.abs(this.vx) < minVelocity && Math.abs(this.vy) < minVelocity) {
+                this.vx = Math.sign(this.vx) * minVelocity || minVelocity;
+                this.vy = Math.sign(this.vy) * minVelocity || minVelocity;
+            }
+
             // Update position
             this.x += this.vx;
             this.y += this.vy;
             this.rotation += this.rotationSpeed;
 
-            // Bounce off walls
+            // Bounce off walls with a small random component
             if (this.x < 0 || this.x > canvas.width - this.size) {
                 this.vx *= -params.bounce;
+                this.vx += (Math.random() - 0.5) * 0.5; // Add small random impulse
                 this.x = Math.max(0, Math.min(this.x, canvas.width - this.size));
             }
             if (this.y < 0 || this.y > canvas.height - this.size) {
                 this.vy *= -params.bounce;
+                this.vy += (Math.random() - 0.5) * 0.5; // Add small random impulse
                 this.y = Math.max(0, Math.min(this.y, canvas.height - this.size));
             }
 
             // Add gravity
             this.vy += params.gravity;
+
+            // Apply maximum velocity limit to prevent excessive speeds
+            const maxVelocity = 15;
+            const currentVelocity = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+            if (currentVelocity > maxVelocity) {
+                const scale = maxVelocity / currentVelocity;
+                this.vx *= scale;
+                this.vy *= scale;
+            }
         }
 
         draw() {
@@ -213,27 +232,65 @@ document.addEventListener('DOMContentLoaded', () => {
             const dx = (this.x + this.size/2) - (other.x + other.size/2);
             const dy = (this.y + this.size/2) - (other.y + other.size/2);
             const distance = Math.sqrt(dx * dx + dy * dy);
+            const minDistance = (this.size + other.size) / 2;
             
-            if (distance < this.size/2 + other.size/2) {
-                // Collision detected - calculate new velocities
-                const angle = Math.atan2(dy, dx);
-                const speed1 = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-                const speed2 = Math.sqrt(other.vx * other.vx + other.vy * other.vy);
-                
-                const direction1 = Math.atan2(this.vy, this.vx);
-                const direction2 = Math.atan2(other.vy, other.vx);
-                
-                const newVx1 = speed2 * Math.cos(direction2 - angle) * Math.cos(angle);
-                const newVy1 = speed2 * Math.cos(direction2 - angle) * Math.sin(angle);
-                const newVx2 = speed1 * Math.cos(direction1 - angle) * Math.cos(angle);
-                const newVy2 = speed1 * Math.cos(direction1 - angle) * Math.sin(angle);
-                
-                this.vx = newVx1 * params.bounce;
-                this.vy = newVy1 * params.bounce;
-                other.vx = newVx2 * params.bounce;
-                other.vy = newVy2 * params.bounce;
-                
-                // Add some rotation on collision
+            if (distance < minDistance) {
+                // Prevent continuous collisions
+                const now = Date.now();
+                if (now - this.lastCollisionTime < 100 || now - other.lastCollisionTime < 100) {
+                    return;
+                }
+                this.lastCollisionTime = now;
+                other.lastCollisionTime = now;
+
+                // Calculate collision normal
+                const nx = dx / distance;
+                const ny = dy / distance;
+
+                // Separate the stickers
+                const overlap = minDistance - distance;
+                const separationX = nx * overlap * 0.5;
+                const separationY = ny * overlap * 0.5;
+
+                this.x += separationX;
+                this.y += separationY;
+                other.x -= separationX;
+                other.y -= separationY;
+
+                // Calculate relative velocity
+                const rvx = this.vx - other.vx;
+                const rvy = this.vy - other.vy;
+
+                // Calculate relative velocity in terms of the normal direction
+                const velAlongNormal = rvx * nx + rvy * ny;
+
+                // Do not resolve if objects are separating
+                if (velAlongNormal > 0) {
+                    return;
+                }
+
+                // Calculate restitution (bounce)
+                const restitution = params.bounce;
+
+                // Calculate impulse scalar
+                const j = -(1 + restitution) * velAlongNormal;
+                const impulseX = j * nx;
+                const impulseY = j * ny;
+
+                // Apply impulse
+                this.vx += impulseX;
+                this.vy += impulseY;
+                other.vx -= impulseX;
+                other.vy -= impulseY;
+
+                // Add small random impulse to break symmetry
+                const randomImpulse = 0.3;
+                this.vx += (Math.random() - 0.5) * randomImpulse;
+                this.vy += (Math.random() - 0.5) * randomImpulse;
+                other.vx += (Math.random() - 0.5) * randomImpulse;
+                other.vy += (Math.random() - 0.5) * randomImpulse;
+
+                // Update rotation speeds
                 this.rotationSpeed = (Math.random() - 0.5) * 0.2;
                 other.rotationSpeed = (Math.random() - 0.5) * 0.2;
             }

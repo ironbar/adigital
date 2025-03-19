@@ -2,6 +2,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('synthwave');
     const ctx = canvas.getContext('2d');
 
+    // Add close button handler
+    document.getElementById('closePopup').addEventListener('click', () => {
+        document.getElementById('winPopup').classList.remove('show');
+    });
+
     // Game UI elements
     const gameStats = document.querySelector('.game-stats');
     const timeDisplay = document.getElementById('timeDisplay');
@@ -27,30 +32,42 @@ document.addEventListener('DOMContentLoaded', () => {
     // Simulation parameters
     let params = {
         gravity: 0.2,
-        bounce: 0.8,
+        bounce: 0.5,
         initialVelocity: 5,
         stickerSize: 80,
         stickerCount: 6
     };
 
+    // Set initial bounce value
+    controls.bounce.value = '0.5';
+    controls.bounce.nextElementSibling.textContent = '0.5';
+
     // Game functions
     function startGame() {
+        if (gameActive) return;
+        
+        document.getElementById('winPopup').classList.remove('show');
         gameActive = true;
         gameStartTime = Date.now();
         gameStats.classList.add('visible');
         playButton.textContent = 'Restart Game';
-        createStickers();
+        stickersRemaining = parseInt(controls.stickerCount.value);
         updateStickerCount();
         
-        // Start the timer
+        // Reset timer
         if (gameTimer) clearInterval(gameTimer);
         gameTimer = setInterval(updateTimer, 100);
+        
+        // Clear existing stickers and create new ones
+        stickers = [];
+        createStickers();
     }
 
     function endGame() {
         gameActive = false;
         clearInterval(gameTimer);
         playButton.textContent = 'Play Again';
+        document.getElementById('winPopup').classList.add('show');
     }
 
     function updateTimer() {

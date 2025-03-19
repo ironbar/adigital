@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
         initialVelocity: document.getElementById('initialVelocity'),
         stickerSize: document.getElementById('stickerSize'),
         stickerCount: document.getElementById('stickerCount'),
-        restart: document.getElementById('restart'),
         togglePanel: document.getElementById('togglePanel'),
         showPanel: document.getElementById('showPanel')
     };
@@ -39,11 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
         gameActive = true;
         gameStartTime = Date.now();
         gameStats.classList.add('visible');
-        playButton.classList.add('hidden');
+        playButton.textContent = 'Restart Game';
         createStickers();
         updateStickerCount();
         
         // Start the timer
+        if (gameTimer) clearInterval(gameTimer);
         gameTimer = setInterval(updateTimer, 100);
     }
 
@@ -51,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
         gameActive = false;
         clearInterval(gameTimer);
         playButton.textContent = 'Play Again';
-        playButton.classList.remove('hidden');
     }
 
     function updateTimer() {
@@ -77,8 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!gameActive) return;
 
         const rect = canvas.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const clickY = e.clientY - rect.top;
+        const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
+        const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
 
         // Check each sticker for click
         for (let i = stickers.length - 1; i >= 0; i--) {
@@ -112,6 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
             control.addEventListener('input', (e) => {
                 params[key] = parseFloat(e.target.value);
                 updateValueDisplay(e.target);
+                if (!gameActive) {
+                    createStickers();
+                    updateStickerCount();
+                }
             });
             updateValueDisplay(control);
         }
@@ -274,12 +277,9 @@ document.addEventListener('DOMContentLoaded', () => {
             .map(path => new Sticker(path, params.stickerSize));
     }
 
-    // Restart simulation
-    controls.restart.addEventListener('click', () => {
-        if (gameActive) return; // Don't allow restart during active game
-        createStickers();
-        updateStickerCount();
-    });
+    // Create initial stickers for preview
+    createStickers();
+    updateStickerCount();
 
     // Wave properties
     const waves = [];

@@ -123,18 +123,24 @@ document.addEventListener('DOMContentLoaded', () => {
             this.x = x;
             this.y = y;
             const angle = Math.random() * Math.PI * 2;
-            const speed = Math.random() * 5 + 2;
+            const speed = Math.random() * 15 + 5;  // Increased speed range
             this.vx = Math.cos(angle) * speed;
             this.vy = Math.sin(angle) * speed;
             this.life = 1.0;
-            this.size = Math.random() * 4 + 2;
+            this.size = Math.random() * 8 + 4;  // Increased size
+            this.color = Math.random() > 0.5 ? 
+                {r: 255, g: 0, b: 255} :  // Magenta
+                {r: 0, g: 255, b: 255};   // Cyan
         }
 
         update() {
             this.x += this.vx;
             this.y += this.vy;
-            this.life -= 0.02;
-            this.size *= 0.95;
+            this.vy += 0.2; // Add gravity to particles
+            this.vx *= 0.98; // Add air resistance
+            this.vy *= 0.98;
+            this.life -= 0.015; // Slower fade out
+            this.size *= 0.97;
         }
 
         draw(ctx) {
@@ -142,8 +148,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.x, this.y, 0,
                 this.x, this.y, this.size
             );
-            gradient.addColorStop(0, `rgba(255, 0, 255, ${this.life})`);
-            gradient.addColorStop(0.5, `rgba(0, 255, 255, ${this.life * 0.5})`);
+            const alpha = this.life;
+            gradient.addColorStop(0, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${alpha})`);
+            gradient.addColorStop(0.4, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${alpha * 0.5})`);
             gradient.addColorStop(1, 'transparent');
 
             ctx.fillStyle = gradient;
@@ -156,36 +163,40 @@ document.addEventListener('DOMContentLoaded', () => {
     let particles = [];
 
     function createExplosion(x, y) {
-        for (let i = 0; i < 20; i++) {
+        // Create more particles for a bigger explosion
+        for (let i = 0; i < 40; i++) {
             particles.push(new Particle(x, y));
         }
     }
 
     // Click handling
     canvas.addEventListener('click', (e) => {
-        if (!gameActive) return;
-
         const rect = canvas.getBoundingClientRect();
         const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
         const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
 
-        // Create explosion at click position
+        // Create explosion at click position (now always active)
         createExplosion(clickX, clickY);
 
-        // Check each sticker for click
-        for (let i = stickers.length - 1; i >= 0; i--) {
-            const sticker = stickers[i];
-            const centerX = sticker.x + sticker.size/2;
-            const centerY = sticker.y + sticker.size/2;
-            const distance = Math.sqrt(
-                Math.pow(clickX - centerX, 2) + 
-                Math.pow(clickY - centerY, 2)
-            );
+        // Only check for sticker clicks if game is active
+        if (gameActive) {
+            // Check each sticker for click
+            for (let i = stickers.length - 1; i >= 0; i--) {
+                const sticker = stickers[i];
+                const centerX = sticker.x + sticker.size/2;
+                const centerY = sticker.y + sticker.size/2;
+                const distance = Math.sqrt(
+                    Math.pow(clickX - centerX, 2) + 
+                    Math.pow(clickY - centerY, 2)
+                );
 
-            if (distance < sticker.size/2) {
-                stickers.splice(i, 1);
-                updateStickerCount();
-                break;
+                if (distance < sticker.size/2) {
+                    stickers.splice(i, 1);
+                    updateStickerCount();
+                    // Create an additional explosion when hitting a sticker
+                    createExplosion(centerX, centerY);
+                    break;
+                }
             }
         }
     });

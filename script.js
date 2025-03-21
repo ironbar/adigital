@@ -380,7 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
         waves.push({
             frequency: 0.02 + (Math.random() * 0.02),
             amplitude: 50 + (Math.random() * 30),
-            speed: 0.05 + (Math.random() * 0.03),
+            speed: 0.15 + (Math.random() * 0.05),
             phase: Math.random() * Math.PI * 2
         });
     }
@@ -511,7 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
             stickers[i].draw();
         }
 
-        time += 0.016;
+        time += 0.032;
         requestAnimationFrame(animate);
     }
 

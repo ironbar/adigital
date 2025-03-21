@@ -2,9 +2,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('synthwave');
     const ctx = canvas.getContext('2d');
 
-    // Add close button handler
+    // Add close button handlers
     document.getElementById('closePopup').addEventListener('click', () => {
         document.getElementById('winPopup').classList.remove('show');
+    });
+
+    document.getElementById('closeInstructions').addEventListener('click', () => {
+        document.getElementById('instructionsPopup').classList.remove('show');
+    });
+
+    // Add instructions button handler
+    document.getElementById('showInstructions').addEventListener('click', () => {
+        document.getElementById('instructionsPopup').classList.add('show');
     });
 
     // Game UI elements
@@ -28,6 +37,17 @@ document.addEventListener('DOMContentLoaded', () => {
         togglePanel: document.getElementById('togglePanel'),
         showPanel: document.getElementById('showPanel')
     };
+
+    // Control panel visibility
+    controls.showPanel.addEventListener('click', () => {
+        document.querySelector('.control-panel').classList.add('visible');
+        controls.showPanel.style.display = 'none';
+    });
+
+    controls.togglePanel.addEventListener('click', () => {
+        document.querySelector('.control-panel').classList.remove('visible');
+        controls.showPanel.style.display = 'block';
+    });
 
     // Simulation parameters
     let params = {
@@ -146,27 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Toggle control panel visibility
-    function toggleControlPanel(show) {
-        const panel = document.querySelector('.control-panel');
-        const showButton = controls.showPanel;
-        
-        if (show === undefined) {
-            show = panel.classList.contains('hidden');
-        }
-        
-        if (show) {
-            panel.classList.remove('hidden');
-            showButton.classList.remove('visible');
-        } else {
-            panel.classList.add('hidden');
-            showButton.classList.add('visible');
-        }
-    }
-
-    controls.togglePanel.addEventListener('click', () => toggleControlPanel(false));
-    controls.showPanel.addEventListener('click', () => toggleControlPanel(true));
-
     // Set canvas size
     function resizeCanvas() {
         canvas.width = window.innerWidth;
@@ -180,11 +179,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let time = 0;
     let mouseX = 0;
     let mouseY = 0;
+    let mouseTrail = [];
+    const maxTrailLength = 20;
 
     // Track mouse movement
     window.addEventListener('mousemove', (e) => {
         mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
         mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+        
+        // Add current position to trail
+        mouseTrail.push({ x: e.clientX, y: e.clientY });
+        if (mouseTrail.length > maxTrailLength) {
+            mouseTrail.shift();
+        }
     });
 
     // Sticker class for physics and rendering
@@ -389,6 +396,25 @@ document.addEventListener('DOMContentLoaded', () => {
         gradient.addColorStop(1, '#330033');
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw mouse trail
+        mouseTrail.forEach((point, index) => {
+            const alpha = (index / maxTrailLength) * 0.5;
+            const size = (index / maxTrailLength) * 10;
+            
+            const trailGradient = ctx.createRadialGradient(
+                point.x, point.y, 0,
+                point.x, point.y, size
+            );
+            trailGradient.addColorStop(0, `rgba(0, 255, 255, ${alpha})`);
+            trailGradient.addColorStop(0.5, `rgba(255, 0, 255, ${alpha * 0.5})`);
+            trailGradient.addColorStop(1, 'transparent');
+            
+            ctx.fillStyle = trailGradient;
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
+            ctx.fill();
+        });
 
         // Add stars
         for (let i = 0; i < 100; i++) {

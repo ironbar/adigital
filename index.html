@@ -42,8 +42,8 @@
                 </div>
                 <div class="control">
                     <label for="bounce">Bounce Elasticity:</label>
-                    <input type="range" id="bounce" min="0" max="1" step="0.05" value="0.8">
-                    <span class="value">0.8</span>
+                    <input type="range" id="bounce" min="0" max="1" step="0.05" value="0.5">
+                    <span class="value">0.5</span>
                 </div>
                 <div class="control">
                     <label for="initialVelocity">Initial Velocity Range:</label>
@@ -53,7 +53,7 @@
                 <div class="control">
                     <label for="stickerSize">Sticker Size:</label>
                     <input type="range" id="stickerSize" min="40" max="150" step="10" value="150">
-                    <span class="value"150</span>
+                    <span class="value">150</span>
                 </div>
             </div>
 
@@ -69,8 +69,17 @@
             <button id="togglePanel" class="toggle-button">Hide Controls</button>
         </div>
 
-        <button id="showPanel" class="show-controls-button">Show Controls</button>
+        <button id="showPanel" class="show-controls-button">Game Parameters</button>
+        <button id="showInstructions" class="show-controls-button">Instructions</button>
         <canvas id="synthwave"></canvas>
+    </div>
+
+    <div class="instructions-popup" id="instructionsPopup">
+        <div class="popup-content">
+            <h2>How to Play</h2>
+            <p>Click on the albañiles digitales as fast as possible!</p>
+            <button class="close-button" id="closeInstructions">Close</button>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

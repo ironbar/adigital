@@ -122,32 +122,195 @@ canvas {
 .show-controls-button {
     position: fixed;
     top: 20px;
-    right: 20px;
     background: var(--primary-color);
     color: var(--text-color);
     border: none;
-    padding: 8px 15px;
+    padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
     font-family: 'Orbitron', sans-serif;
-    z-index: 99;
-    transition: background-color 0.3s ease;
-    opacity: 0;
-    pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 1000;
 }
 
-.show-controls-button.visible {
-    opacity: 1;
-    pointer-events: auto;
+#showPanel {
+    right: 20px;
+}
+
+#showInstructions {
+    right: 200px;
 }
 
 .show-controls-button:hover {
     background: var(--secondary-color);
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+.instructions-popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.instructions-popup.show {
+    display: flex;
+}
+
+.game-ui {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+}
+
+.game-stats {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 15px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--secondary-color);
+    color: var(--text-color);
+    font-family: 'Orbitron', sans-serif;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: all 0.3s ease;
+}
+
+.game-stats.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.timer, .score {
+    font-size: 1.2rem;
+    color: var(--secondary-color);
+}
+
+.play-button {
+    background: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+}
+
+.play-button:hover {
+    background: var(--secondary-color);
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+}
+
+.play-button.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.9);
+}
+
+.game-title {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2.5em;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.win-popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.win-popup.show {
+    display: flex;
+}
+
+.popup-content {
+    background-color: rgba(30, 30, 40, 0.95);
+    padding: 2em;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+    border: 2px solid rgba(255, 0, 255, 0.3);
+    max-width: 80%;
+}
+
+.popup-content img {
+    max-width: 300px;
+    margin-bottom: 1em;
+    border-radius: 10px;
+}
+
+.popup-content h2 {
+    color: #fff;
+    font-size: 2em;
+    margin-bottom: 0.5em;
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+}
+
+.popup-content p {
+    color: #fff;
+    font-size: 1.2em;
+    margin: 0;
+    text-shadow: 0 0 5px rgba(255, 0, 255, 0.3);
+}
+
+.close-button {
+    background: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 10px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1em;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+.close-button:hover {
+    background: var(--secondary-color);
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
 }
 
 .control-panel {
     position: fixed;
-    top: 20px;
+    top: 80px;
     right: 20px;
     background: rgba(0, 0, 0, 0.8);
     padding: 20px;
@@ -158,14 +321,15 @@ canvas {
     z-index: 100;
     width: 300px;
     transition: all 0.3s ease;
-    pointer-events: auto;
-    opacity: 1;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(320px);
 }
 
-.control-panel.hidden {
-    transform: translateX(320px);
-    opacity: 0;
-    pointer-events: none;
+.control-panel.visible {
+    pointer-events: auto;
+    opacity: 1;
+    transform: translateX(0);
 }
 
 .control-group {
@@ -250,146 +414,4 @@ canvas {
     border: 1px solid var(--primary-color);
     margin-top: 10px;
     width: 100%;
-}
-
-.game-ui {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.game-stats {
-    background: rgba(0, 0, 0, 0.8);
-    padding: 15px;
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--secondary-color);
-    color: var(--text-color);
-    font-family: 'Orbitron', sans-serif;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    opacity: 0;
-    transform: translateX(-20px);
-    transition: all 0.3s ease;
-}
-
-.game-stats.visible {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-.timer, .score {
-    font-size: 1.2rem;
-    color: var(--secondary-color);
-}
-
-.play-button {
-    background: var(--primary-color);
-    color: var(--text-color);
-    border: none;
-    padding: 15px 30px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.2rem;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
-}
-
-.play-button:hover {
-    background: var(--secondary-color);
-    transform: scale(1.05);
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
-}
-
-.play-button.hidden {
-    opacity: 0;
-    pointer-events: none;
-    transform: scale(0.9);
-}
-
-.game-title {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 2.5em;
-    font-weight: bold;
-    color: rgba(255, 255, 255, 0.8);
-    text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
-    z-index: 1000;
-    pointer-events: none;
-}
-
-.win-popup {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    z-index: 2000;
-    justify-content: center;
-    align-items: center;
-}
-
-.win-popup.show {
-    display: flex;
-}
-
-.popup-content {
-    background-color: rgba(30, 30, 40, 0.95);
-    padding: 2em;
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
-    border: 2px solid rgba(255, 0, 255, 0.3);
-    max-width: 80%;
-}
-
-.popup-content img {
-    max-width: 300px;
-    margin-bottom: 1em;
-    border-radius: 10px;
-}
-
-.popup-content h2 {
-    color: #fff;
-    font-size: 2em;
-    margin-bottom: 0.5em;
-    text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
-}
-
-.popup-content p {
-    color: #fff;
-    font-size: 1.2em;
-    margin: 0;
-    text-shadow: 0 0 5px rgba(255, 0, 255, 0.3);
-}
-
-.close-button {
-    background: var(--primary-color);
-    color: var(--text-color);
-    border: none;
-    padding: 10px 25px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.1em;
-    margin-top: 20px;
-    transition: all 0.3s ease;
-}
-
-.close-button:hover {
-    background: var(--secondary-color);
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
 } 

@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Particle system
     class Particle {
-        constructor(x, y) {
+        constructor(x, y, isStickerHit = false) {
             this.x = x;
             this.y = y;
             const angle = Math.random() * Math.PI * 2;
@@ -128,9 +128,19 @@ document.addEventListener('DOMContentLoaded', () => {
             this.vy = Math.sin(angle) * speed;
             this.life = 1.0;
             this.size = Math.random() * 8 + 4;  // Increased size
-            this.color = Math.random() > 0.5 ? 
-                {r: 255, g: 0, b: 255} :  // Magenta
-                {r: 0, g: 255, b: 255};   // Cyan
+            
+            if (isStickerHit) {
+                // Gold and white colors for sticker hits
+                this.color = Math.random() > 0.5 ? 
+                    {r: 255, g: 215, b: 0} :     // Gold
+                    {r: 255, g: 255, b: 255};    // White
+                this.size *= 1.5;  // Bigger particles for hits
+            } else {
+                // Original magenta and cyan for regular clicks
+                this.color = Math.random() > 0.5 ? 
+                    {r: 255, g: 0, b: 255} :     // Magenta
+                    {r: 0, g: 255, b: 255};      // Cyan
+            }
         }
 
         update() {
@@ -162,10 +172,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let particles = [];
 
-    function createExplosion(x, y) {
+    function createExplosion(x, y, isStickerHit = false) {
         // Create more particles for a bigger explosion
-        for (let i = 0; i < 40; i++) {
-            particles.push(new Particle(x, y));
+        const particleCount = isStickerHit ? 60 : 40;  // More particles for sticker hits
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle(x, y, isStickerHit));
         }
     }
 
@@ -175,8 +186,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
         const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
 
-        // Create explosion at click position (now always active)
-        createExplosion(clickX, clickY);
+        // Create regular explosion at click position (now always active)
+        createExplosion(clickX, clickY, false);
 
         // Only check for sticker clicks if game is active
         if (gameActive) {
@@ -193,8 +204,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (distance < sticker.size/2) {
                     stickers.splice(i, 1);
                     updateStickerCount();
-                    // Create an additional explosion when hitting a sticker
-                    createExplosion(centerX, centerY);
+                    // Create special explosion when hitting a sticker
+                    createExplosion(centerX, centerY, true);
                     break;
                 }
             }

@@ -189,9 +189,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Create regular explosion at click position (now always active)
         createExplosion(clickX, clickY, false);
 
-        // Only check for sticker clicks if game is active
+        // Only check for sticker interactions if game is active
         if (gameActive) {
-            // Check each sticker for click
+            let hitSticker = false;
+            
+            // Check each sticker for click or proximity
             for (let i = stickers.length - 1; i >= 0; i--) {
                 const sticker = stickers[i];
                 const centerX = sticker.x + sticker.size/2;
@@ -202,11 +204,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 );
 
                 if (distance < sticker.size/2) {
+                    // Direct hit
                     stickers.splice(i, 1);
                     updateStickerCount();
-                    // Create special explosion when hitting a sticker
                     createExplosion(centerX, centerY, true);
+                    hitSticker = true;
                     break;
+                } else if (distance < sticker.size * 2) {
+                    // Near miss - apply repulsive force
+                    const angle = Math.atan2(centerY - clickY, centerX - clickX);
+                    const force = (1 - distance / (sticker.size * 2)) * 15; // Stronger force when closer
+                    sticker.vx += Math.cos(angle) * force;
+                    sticker.vy += Math.sin(angle) * force;
+                    
+                    // Add some rotation based on the force
+                    sticker.rotationSpeed += (Math.random() - 0.5) * force * 0.1;
                 }
             }
         }

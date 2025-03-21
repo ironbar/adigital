@@ -44,15 +44,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Game functions
     function startGame() {
-        if (gameActive) return;
-        
-        document.getElementById('winPopup').classList.remove('show');
+        // Reset game state
         gameActive = true;
         gameStartTime = Date.now();
         gameStats.classList.add('visible');
         playButton.textContent = 'Restart Game';
-        stickersRemaining = parseInt(controls.stickerCount.value);
-        updateStickerCount();
         
         // Reset timer
         if (gameTimer) clearInterval(gameTimer);
@@ -61,12 +57,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // Clear existing stickers and create new ones
         stickers = [];
         createStickers();
+        
+        // Update sticker count after creating stickers
+        stickersRemaining = stickers.length;
+        updateStickerCount();
     }
 
     function endGame() {
         gameActive = false;
         clearInterval(gameTimer);
         playButton.textContent = 'Play Again';
+        gameStats.classList.remove('visible');
         document.getElementById('winPopup').classList.add('show');
     }
 
@@ -83,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateStickerCount() {
         stickersRemainingDisplay.textContent = stickers.length.toString();
+        // Only end game if we're in an active game and stickers are clicked
         if (stickers.length === 0 && gameActive) {
             endGame();
         }
@@ -115,7 +117,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Play button handler
-    playButton.addEventListener('click', startGame);
+    playButton.addEventListener('click', () => {
+        // Always hide popup first
+        const popup = document.getElementById('winPopup');
+        popup.classList.remove('show');
+        
+        // Start a new game
+        startGame();
+    });
 
     // Update parameter displays
     function updateValueDisplay(input) {

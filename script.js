@@ -110,6 +110,57 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Animation variables
+    let time = 0;
+    let mouseX = 0;
+    let mouseY = 0;
+    let mouseTrail = [];
+    const maxTrailLength = 20;
+
+    // Particle system
+    class Particle {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 5 + 2;
+            this.vx = Math.cos(angle) * speed;
+            this.vy = Math.sin(angle) * speed;
+            this.life = 1.0;
+            this.size = Math.random() * 4 + 2;
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life -= 0.02;
+            this.size *= 0.95;
+        }
+
+        draw(ctx) {
+            const gradient = ctx.createRadialGradient(
+                this.x, this.y, 0,
+                this.x, this.y, this.size
+            );
+            gradient.addColorStop(0, `rgba(255, 0, 255, ${this.life})`);
+            gradient.addColorStop(0.5, `rgba(0, 255, 255, ${this.life * 0.5})`);
+            gradient.addColorStop(1, 'transparent');
+
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    let particles = [];
+
+    function createExplosion(x, y) {
+        for (let i = 0; i < 20; i++) {
+            particles.push(new Particle(x, y));
+        }
+    }
+
     // Click handling
     canvas.addEventListener('click', (e) => {
         if (!gameActive) return;
@@ -117,6 +168,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const rect = canvas.getBoundingClientRect();
         const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
         const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+        // Create explosion at click position
+        createExplosion(clickX, clickY);
 
         // Check each sticker for click
         for (let i = stickers.length - 1; i >= 0; i--) {
@@ -174,13 +228,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
-
-    // Animation variables
-    let time = 0;
-    let mouseX = 0;
-    let mouseY = 0;
-    let mouseTrail = [];
-    const maxTrailLength = 20;
 
     // Track mouse movement
     window.addEventListener('mousemove', (e) => {
@@ -396,6 +443,13 @@ document.addEventListener('DOMContentLoaded', () => {
         gradient.addColorStop(1, '#330033');
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Update and draw particles
+        particles = particles.filter(p => p.life > 0);
+        particles.forEach(particle => {
+            particle.update();
+            particle.draw(ctx);
+        });
 
         // Draw mouse trail
         mouseTrail.forEach((point, index) => {
